@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: worker-dotnet-cronjob
+spec:
+  schedule: "0 3 * * *"  # Executa diariamente às 03:00 UTC
+  successfulJobsHistoryLimit: 1  # Mantém apenas 1 Job bem-sucedido no histórico
+  failedJobsHistoryLimit: 1  # Mantém apenas 1 Job com falha no histórico
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600  # Remove o Job 1 hora após a conclusão
+      template:
+        spec:
+          containers:
+          - name: meu-worker
+            image: meu-worker:latest
+            imagePullPolicy: Never
+            ports:
+            - containerPort: 80
+            env:
+            - name: DOTNET_ENVIRONMENT
+              value: "Production"
+          restartPolicy: Never  # O Pod não reinicia após finalizar
+
